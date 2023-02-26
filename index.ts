@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 import moment from 'moment';
 
 const app = express(),
-    port = 3000,
+    port = process.env.PORT ? parseInt(process.env.PORT) : 6481,
     schedules = new Map<string, any>();
 
 app.use(express.json());
