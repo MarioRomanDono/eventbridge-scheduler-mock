@@ -14,6 +14,38 @@ app.use(function(_req, res, next) {
     next();
 });
 
+app.get('/schedules/:name', (req, res) => {
+    const scheduleName = req.params.name,
+        validationErrors: Array<string> = [];
+
+    if (scheduleName.length > 64) {
+        validationErrors.push(`Value ${scheduleName} at 'name' failed to satisfy constraint: Member must have length less than or equal to 64`);
+    }
+
+    if (!scheduleName.match(/^[0-9a-zA-Z-_.]+$/)) {
+        validationErrors.push(`Value ${scheduleName} at 'name' failed to satisfy constraint: Member must satisfy regular expression pattern: [0-9a-zA-Z-_.]+`);
+    }
+
+    if (validationErrors.length > 0) {
+        const numberOfErrors = validationErrors.length;
+        res.status(400).json({
+            'code': 'ValidationException',
+            'message': `${numberOfErrors} validation ${numberOfErrors === 1 ? 'error' : 'errors'} detected: ${validationErrors.join('; ')}`
+        });
+        return;
+    }
+
+    if (!schedules.has(scheduleName)) {
+        res.status(404).json({
+            'code': 'ResourceNotFoundException',
+            'message': `Schedule ${scheduleName} does not exist.`
+        });
+        return;
+    }
+
+    res.json(schedules.get(scheduleName));
+});
+
 app.delete('/schedules/:name', (req, res) => {
     const scheduleName = req.params.name,
         validationErrors: Array<string> = [];
