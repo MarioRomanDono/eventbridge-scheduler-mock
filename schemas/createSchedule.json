@@ -1,0 +1,412 @@
+
+
+{
+    "type": "object",
+    "properties": {
+        "ClientToken": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-_]+$",
+            "minLength": 1,
+            "maxLength": 64
+        },
+        "Description": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 512
+        },
+        "EndDate": {
+            "type": "integer"
+        },
+        "FlexibleTimeWindow": {
+            "type": "object",
+            "properties": {
+                "MaximumWindowInMinutes": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1440
+                },
+                "Mode": {
+                    "type": "string",
+                    "enum": [
+                        "OFF",
+                        "FLEXIBLE"
+                    ]
+                }
+            },
+            "required": [
+                "Mode"
+            ],
+            "additionalProperties": false
+        },
+        "GroupName": {
+            "type": "string",
+            "pattern": "^[0-9a-zA-Z-_.]+$",
+            "minLength": 1,
+            "maxLength": 64
+        },
+        "KmsKeyArn": {
+            "type": "string",
+            "pattern": "^arn:aws(-[a-z]+)?:kms:[a-z0-9\\-]+:\\d{12}:(key|alias)\/[0-9a-zA-Z-_]*$",
+            "minLength": 1,
+            "maxLength": 2048
+        },
+        "ScheduleExpression": {
+            "oneOf": [
+                {"type": "string", "pattern": "^cron\\((@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\\d+(ns|us|µs|ms|s|m|h))+)|((((\\d+,)+\\d+|(\\d+(\/|-)\\d+)|\\d+|\\*) ?){5,7})\\)$"},
+                {"type": "string", "pattern": "^rate\\(\\d+ (minute|minutes|hour|hours|day|days)\\)$"},
+                {"type": "string", "pattern": "^at\\(\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\d:[0-5]\\d\\)$"}
+            ],
+            "minLength": 1,
+            "maxLength": 256
+        },
+        "ScheduleExpressionTimezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+        },
+        "StartDate": {
+            "type": "integer"
+        },
+        "State": {
+            "type": "string",
+            "enum": [
+                "ENABLED",
+                "DISABLED"
+            ]
+        },
+        "Target": {
+            "type": "object",
+            "properties": {
+                "Arn": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1600
+                },
+                "DeadLetterConfig": {
+                    "type": "object",
+                    "properties": {
+                        "Arn": {
+                            "type": "string",
+                            "pattern": "^arn:aws(-[a-z]+)?:sqs:[a-z0-9\\-]+:\\d{12}:[a-zA-Z0-9\\-_]+$",
+                            "minLength": 1,
+                            "maxLength": 1600
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "EcsParameters": {
+                    "type": "object",
+                    "properties": {
+                        "CapacityProviderStrategy": {
+                            "type": "array",
+                            "items": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "base": {
+                                            "type": "integer",
+                                            "minimum": 0,
+                                            "maximum": 100000
+                                        },
+                                        "capacityProvider": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 255
+                                        },
+                                        "weight": {
+                                            "type": "integer",
+                                            "minimum": 0,
+                                            "maximum": 1000
+                                        }
+                                    },
+                                    "required": [
+                                        "capacityProvider"
+                                    ]
+                                }
+                            ],
+                            "minItems": 0,
+                            "maxItems": 6
+                        },
+                        "EnableECSManagedTags": {
+                            "type": "boolean"
+                        },
+                        "EnableExecuteCommand": {
+                            "type": "boolean"
+                        },
+                        "Group": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                        },
+                        "LaunchType": {
+                            "type": "string",
+                            "enum": [
+                                "EC2",
+                                "FARGATE",
+                                "EXTERNAL"
+                            ]
+                        },
+                        "NetworkConfiguration": {
+                            "type": "object",
+                            "properties": {
+                                "awsvpcConfiguration": {
+                                    "type": "object",
+                                    "properties": {
+                                        "AssignPublicIp": {
+                                            "type": "string",
+                                            "enum": [
+                                                "DISABLED",
+                                                "ENABLED"
+                                            ]
+                                        },
+                                        "SecurityGroups": {
+                                            "type": "array",
+                                            "items": [
+                                                {
+                                                    "type": "string",
+                                                    "minLength": 1,
+                                                    "maxLength": 1000
+                                                }
+                                            ],
+                                            "minItems": 1,
+                                            "maxItems": 5
+                                        },
+                                        "Subnets": {
+                                            "type": "array",
+                                            "items": [
+                                                {
+                                                    "type": "string",
+                                                    "minLength": 1,
+                                                    "maxLength": 1000
+                                                }
+                                            ],
+                                            "minItems": 1,
+                                            "maxItems": 16
+                                        }
+                                    },
+                                    "required": [
+                                        "Subnets"
+                                    ]
+                                }
+                            }
+                        },
+                        "PlacementConstraints": {
+                            "type": "array",
+                            "items": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "expression": {
+                                            "type": "string",
+                                            "minLength": 0,
+                                            "maxLength": 2000
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "distinctInstance",
+                                                "memberOf"
+                                            ]
+                                        }
+                                    }
+                                }
+                            ],
+                            "minItems": 0,
+                            "maxItems": 10
+                        },
+                        "PlacementStrategy": {
+                            "type": "array",
+                            "items": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "field": {
+                                            "type": "string",
+                                            "minLength": 0,
+                                            "maxLength": 255
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "binpack",
+                                                "random",
+                                                "spread"
+                                            ]
+                                        }
+                                    }
+                                }
+                            ],
+                            "minItems": 0,
+                            "maxItems": 5
+                        },
+                        "PlatformVersion": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64
+                        },
+                        "PropagateTags": {
+                            "type": "string",
+                            "enum": [
+                                "TASK_DEFINITION"
+                            ]
+                        },
+                        "ReferenceId": {
+                            "type": "string",
+                            "minLength": 0,
+                            "maxLength": 1024
+                        },
+                        "Tags": {
+                            "type": "array",
+                            "items": [
+                                {
+                                    "type": "object",
+                                    "patternProperties": {
+                                        "^.{1,128}$": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 256
+                                        }
+                                    },
+                                    "minProperties": 1
+                                }
+                            ],
+                            "minItems": 0,
+                            "maxItems": 50
+                        },
+                        "TaskCount": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 10
+                        },
+                        "TaskDefinitionArn": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1600
+                        }
+                    },
+                    "required": [
+                        "TaskDefinitionArn"
+                    ],
+                    "additionalProperties": false
+                },
+                "EventBridgeParameters": {
+                    "type": "object",
+                    "properties": {
+                        "DetailType": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128
+                        },
+                        "Source": {
+                            "type": "string",
+                            "pattern": "^(?=[/\\.\\-_A-Za-z0-9]+)((?!aws\\.).*)|(\\$(\\.[\\w_-]+(\\[(\\d+|\\*)\\])*)*)$",
+                            "minLength": 1,
+                            "maxLength": 256
+                        }
+                    },
+                    "required": [
+                        "DetailType",
+                        "Source"
+                    ],
+                    "additionalProperties": false
+                },
+                "Input": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "KinesisParameters": {
+                    "type": "object",
+                    "properties": {
+                        "PartitionKey": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256
+                        }
+                    },
+                    "required": [
+                        "PartitionKey"
+                    ],
+                    "additionalProperties": false
+                },
+                "RetryPolicy": {
+                    "type": "object",
+                    "properties": {
+                        "MaximumEventAgeInSeconds": {
+                            "type": "integer",
+                            "minimum": 60,
+                            "maximum": 86400
+                        },
+                        "MaximumRetryAttempts": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 185
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "RoleArn": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1600,
+                    "pattern": "^arn:aws(-[a-z]+)?:iam::\\d{12}:role\/(service-role\/){0,1}[a-zA-Z0-9\\+=,\\.@\\-_]+$"
+                },
+                "SageMakerPipelineParameters": {
+                    "type": "object",
+                    "properties": {
+                        "PipelineParameterList": {
+                            "type": "array",
+                            "items": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "Name": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 256,
+                                            "pattern": "^[A-Za-z0-9\\-_]*$"
+                                        },
+                                        "Value": {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "maxLength": 1024
+                                        }
+                                    },
+                                    "required": [
+                                        "Name",
+                                        "Value"
+                                    ]
+                                }
+                            ],
+                            "minItems": 0,
+                            "maxItems": 200
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "SqsParameters": {
+                    "type": "object",
+                    "properties": {
+                        "MessageGroupId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "Arn",
+                "RoleArn"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "FlexibleTimeWindow",
+        "ScheduleExpression",
+        "Target"
+    ],
+    "additionalProperties": false
+}
+
