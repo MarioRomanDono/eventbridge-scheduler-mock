@@ -148,4 +148,6 @@ function createSchedule(scheduleName: string, scheduleBody: any) {
     }
 }
 
-app.listen(port);
+app.listen(port, () => {
+    console.log(`EventBridge Scheduler mock running on port ${port}`);
+});
